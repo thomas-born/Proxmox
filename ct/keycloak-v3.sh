@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
+APP="Keycloak"
+var_disk="4"
+var_cpu="2"
+var_ram="2048"
+var_os="debian"
+var_version="11"
 NEXTID=$(pvesh get /cluster/nextid)
 INTEGER='^[0-9]+$'
+NSAPP=$(echo ${APP,,} | tr -d ' ')
+var_install="${NSAPP}-install"
 YW=`echo "\033[33m"`
 BL=`echo "\033[36m"`
 RD=`echo "\033[01;31m"`
@@ -11,9 +19,6 @@ CL=`echo "\033[m"`
 BFR="\\r\\033[K"
 HOLD="-"
 CM="${GN}✓${CL}"
-CROSS="${RD}✗${CL}"
-APP="Jellyfin"
-NSAPP=$(echo ${APP,,} | tr -d ' ')
 set -o errexit
 set -o errtrace
 set -o nounset
@@ -31,6 +36,16 @@ function error_exit() {
   exit $EXIT
 }
 
+function msg_info() {
+   local msg="$1"
+   echo -ne " ${HOLD} ${YW}${msg}..."
+}
+
+function msg_ok() {
+   local msg="$1"
+   echo -e "${BFR} ${CM} ${GN}${msg}${CL}"
+}
+
 while true; do
     read -p "This will create a New ${APP} LXC. Proceed(y/n)?" yn
     case $yn in
@@ -41,29 +56,18 @@ while true; do
 done
 clear
 function header_info {
-echo -e "${DGN}
-       _      _ _        __ _       
-      | |    | | |      / _(_)      
-      | | ___| | |_v3 _| |_ _ _ __  
-  _   | |/ _ \ | | | | |  _| |  _ \ 
- | |__| |  __/ | | |_| | | | | | | |
-  \____/ \___|_|_|\__, |_| |_|_| |_|
-                   __/ |            
-                  |___/             
+echo -e "${RD}
+
+  _  __________     _______ _      ____          _  __
+ | |/ /  ____\ \   / / ____| |    / __ \   /\   | |/ /
+ | ' /| |__   \ \_/ / |    | |   | |  | | /  \  | ' / 
+ |  < |  __|   \   /| | v3 | |   | |  | |/ /\ \ |  <  
+ | . \| |____   | | | |____| |___| |__| / ____ \| . \ 
+ |_|\_\______|  |_|  \_____|______\____/_/    \_\_|\_\
 ${CL}"
 }
 
 header_info
-
-function msg_info() {
-    local msg="$1"
-    echo -ne " ${HOLD} ${YW}${msg}..."
-}
-
-function msg_ok() {
-    local msg="$1"
-    echo -e "${BFR} ${CM} ${GN}${msg}${CL}"
-}
 
 function PVE_CHECK() {
     PVE=$(pveversion | grep "pve-manager/7" | wc -l)
@@ -80,26 +84,26 @@ function default_settings() {
         clear
         header_info
         echo -e "${BL}Using Default Settings${CL}"
-        echo -e "${DGN}Using CT Type ${BGN}Privileged${CL}"
-        CT_TYPE="0"
-	echo -e "${DGN}Using CT Password ${BGN}Automatic Login${CL}"
-	PW=" "
-	echo -e "${DGN}Using CT ID ${BGN}$NEXTID${CL}"
-	CT_ID=$NEXTID
-	echo -e "${DGN}Using CT Name ${BGN}$NSAPP${CL}"
-	HN=$NSAPP
-	echo -e "${DGN}Using Disk Size ${BGN}8${CL}${DGN}GB${CL}"
-	DISK_SIZE="8"
-	echo -e "${DGN}Using ${BGN}2${CL}${DGN}vCPU${CL}"
-	CORE_COUNT="2"
-	echo -e "${DGN}Using ${BGN}2048${CL}${DGN}MiB RAM${CL}"
-	RAM_SIZE="2048"
-	echo -e "${DGN}Using Bridge ${BGN}vmbr0${CL}"
-	BRG="vmbr0"
-	echo -e "${DGN}Using Static IP Address ${BGN}DHCP${CL}"
-	NET=dhcp
-	echo -e "${DGN}Using Gateway Address ${BGN}NONE${CL}"
-	GATE=""
+        echo -e "${DGN}Using CT Type ${BGN}Unprivileged${CL} ${RD}NO DEVICE PASSTHROUGH${CL}"
+        CT_TYPE="1"
+        echo -e "${DGN}Using CT Password ${BGN}Automatic Login${CL}"
+        PW=" "
+        echo -e "${DGN}Using CT ID ${BGN}$NEXTID${CL}"
+        CT_ID=$NEXTID
+        echo -e "${DGN}Using CT Name ${BGN}$NSAPP${CL}"
+        HN=$NSAPP
+        echo -e "${DGN}Using Disk Size ${BGN}$var_disk${CL}${DGN}GB${CL}"
+        DISK_SIZE="$var_disk"
+        echo -e "${DGN}Using ${BGN}$var_cpu${CL}${DGN}vCPU${CL}"
+        CORE_COUNT="$var_cpu"
+        echo -e "${DGN}Using ${BGN}$var_ram${CL}${DGN}MiB RAM${CL}"
+        RAM_SIZE="$var_ram"
+        echo -e "${DGN}Using Bridge ${BGN}vmbr0${CL}"
+        BRG="vmbr0"
+        echo -e "${DGN}Using Static IP Address ${BGN}DHCP${CL}"
+        NET=dhcp
+        echo -e "${DGN}Using Gateway Address ${BGN}NONE${CL}"
+        GATE=""
         echo -e "${DGN}Using VLAN Tag ${BGN}NONE${CL}"
         VLAN=""
 }
@@ -108,14 +112,14 @@ function advanced_settings() {
         clear
         header_info
         echo -e "${RD}Using Advanced Settings${CL}"
-        echo -e "${YW}Type ${CROSS}${YW}Unprivileged, or Press [ENTER] for Default: Privileged"
+        echo -e "${YW}Type Privileged, or Press [ENTER] for Default: Unprivileged (${RD}NO DEVICE PASSTHROUGH${CL}${YW})"
         read CT_TYPE1
-        if [ -z $CT_TYPE1 ]; then CT_TYPE1="Privileged" CT_TYPE="0"; 
+        if [ -z $CT_TYPE1 ]; then CT_TYPE1="Unprivileged" CT_TYPE="1"; 
         echo -en "${DGN}Set CT Type ${BL}$CT_TYPE1${CL}"
         else
-        CT_TYPE1="Unprivileged"
-        CT_TYPE="1"
-        echo -en "${DGN}Set CT Type ${BL}Unprivileged${CL}"  
+        CT_TYPE1="Privileged"
+        CT_TYPE="0"
+        echo -en "${DGN}Set CT Type ${BL}Privileged${CL}"  
         fi;
 echo -e " ${CM}${CL} \r"
 sleep 1
@@ -167,9 +171,9 @@ header_info
         echo -e "${DGN}Using CT Password ${BGN}$PW1${CL}"
         echo -e "${DGN}Using CT ID ${BGN}$CT_ID${CL}"
         echo -e "${DGN}Using CT Name ${BGN}$HN${CL}"
-        echo -e "${YW}Enter a Disk Size, or Press [ENTER] for Default: 8 "
+        echo -e "${YW}Enter a Disk Size, or Press [ENTER] for Default: $var_disk "
         read DISK_SIZE
-        if [ -z $DISK_SIZE ]; then DISK_SIZE="8"; fi;
+        if [ -z $DISK_SIZE ]; then DISK_SIZE="$var_disk"; fi;
         if ! [[ $DISK_SIZE =~ $INTEGER ]] ; then echo "ERROR! DISK SIZE MUST HAVE INTEGER NUMBER!"; exit; fi;
         echo -en "${DGN}Set Disk Size To ${BL}$DISK_SIZE${CL}${DGN}GB${CL}"
 echo -e " ${CM}${CL} \r"
@@ -182,9 +186,9 @@ header_info
         echo -e "${DGN}Using CT ID ${BGN}$CT_ID${CL}"
         echo -e "${DGN}Using CT Name ${BGN}$HN${CL}"
         echo -e "${DGN}Using Disk Size ${BGN}$DISK_SIZE${CL}${DGN}GB${CL}"
-        echo -e "${YW}Allocate CPU cores, or Press [ENTER] for Default: 2 "
+        echo -e "${YW}Allocate CPU cores, or Press [ENTER] for Default: $var_cpu "
         read CORE_COUNT
-        if [ -z $CORE_COUNT ]; then CORE_COUNT="2"; fi;
+        if [ -z $CORE_COUNT ]; then CORE_COUNT="$var_cpu"; fi;
         echo -en "${DGN}Set Cores To ${BL}$CORE_COUNT${CL}${DGN}vCPU${CL}"
 echo -e " ${CM}${CL} \r"
 sleep 1
@@ -197,9 +201,9 @@ header_info
         echo -e "${DGN}Using CT Name ${BGN}$HN${CL}"
         echo -e "${DGN}Using Disk Size ${BGN}$DISK_SIZE${CL}${DGN}GB${CL}"
         echo -e "${DGN}Using ${BGN}${CORE_COUNT}${CL}${DGN}vCPU${CL}"
-        echo -e "${YW}Allocate RAM in MiB, or Press [ENTER] for Default: 2048 "
+        echo -e "${YW}Allocate RAM in MiB, or Press [ENTER] for Default: $var_ram "
         read RAM_SIZE
-        if [ -z $RAM_SIZE ]; then RAM_SIZE="2048"; fi;
+        if [ -z $RAM_SIZE ]; then RAM_SIZE="$var_ram"; fi;
         echo -en "${DGN}Set RAM To ${BL}$RAM_SIZE${CL}${DGN}MiB RAM${CL}"
 echo -e " ${CM}${CL} \n"
 sleep 1
@@ -314,7 +318,6 @@ function start_script() {
 		fi;
 }
 
-PVE_CHECK
 start_script
 
 if [ "$CT_TYPE" == "1" ]; then 
@@ -323,12 +326,9 @@ if [ "$CT_TYPE" == "1" ]; then
  FEATURES="nesting=1"
  fi
 
-TEMP_DIR=$(mktemp -d)
-pushd $TEMP_DIR >/dev/null
-
 export CTID=$CT_ID
-export PCT_OSTYPE=ubuntu
-export PCT_OSVERSION=20.04
+export PCT_OSTYPE=$var_os
+export PCT_OSVERSION=$var_version
 export PCT_DISK_SIZE=$DISK_SIZE
 export PCT_OPTIONS="
   -features $FEATURES
@@ -342,24 +342,14 @@ export PCT_OPTIONS="
 "
 bash -c "$(wget -qLO - https://raw.githubusercontent.com/tteck/Proxmox/main/ct/create_lxc.sh)" || exit
 
-LXC_CONFIG=/etc/pve/lxc/${CTID}.conf
-cat <<EOF >> $LXC_CONFIG
-lxc.cgroup2.devices.allow: c 226:0 rwm
-lxc.cgroup2.devices.allow: c 226:128 rwm
-lxc.cgroup2.devices.allow: c 29:0 rwm
-lxc.mount.entry: /dev/fb0 dev/fb0 none bind,optional,create=file
-lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir
-lxc.mount.entry: /dev/dri/renderD128 dev/renderD128 none bind,optional,create=file
-EOF
-
 msg_info "Starting LXC Container"
 pct start $CTID
 msg_ok "Started LXC Container"
 
-lxc-attach -n $CTID -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/tteck/Proxmox/main/setup/jellyfin-install.sh)" || exit
+lxc-attach -n $CTID -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/tteck/Proxmox/main/setup/$var_install.sh)" || exit
 
 IP=$(pct exec $CTID ip a s dev eth0 | sed -n '/inet / s/\// /p' | awk '{print $2}')
 
 msg_ok "Completed Successfully!\n"
-echo -e "Jellyfin Media Server should be reachable by going to the following URL.
-             ${BL}http://${IP}:8096${CL}\n"
+echo -e "${APP} should be reachable by going to the following URL.
+         ${BL}http://${IP}:8080${CL} \n"

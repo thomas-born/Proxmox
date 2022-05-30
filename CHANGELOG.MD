@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 
 ### ⚠️ [IMPORTANT NOTICE](https://github.com/tteck/Proxmox/issues/71#issue-1169207591)
 
+## 2022-05-29
+
+### Changed
+
+- **Vaultwarden LXC**
+  - Code refactoring
+- **CrowdSec**
+  - NEW Script.
+
+## 2022-05-21
+
+### Changed
+
+- **Home Assistant OS VM**
+  - Code refactoring
+
+## 2022-05-19
+
+### Changed
+
+- **Keycloak LXC**
+  - NEW Script.
+
+## 2022-05-18
+
+### Changed
+
+- **File Browser**
+  - NEW Script.
+
 ## 2022-05-13
 
 ### Changed

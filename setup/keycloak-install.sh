@@ -42,17 +42,23 @@ msg_info "Setting up Container OS "
 sed -i "/$LANG/ s/\(^# \)//" /etc/locale.gen
 locale-gen >/dev/null
 while [ "$(hostname -I)" = "" ]; do
-  1>&2 echo -en "${CROSS}${RD}  No Network! "
+  1>&2 echo -en "${CROSS}${RD} No Network! "
   sleep $RETRY_EVERY
   ((NUM--))
   if [ $NUM -eq 0 ]
   then
-    1>&2 echo -e "${CROSS}${RD}  No Network After $RETRY_NUM Tries${CL}"    
+    1>&2 echo -e "${CROSS}${RD} No Network After $RETRY_NUM Tries${CL}"    
     exit 1
   fi
 done
 msg_ok "Set up Container OS"
 msg_ok "Network Connected: ${BL}$(hostname -I)"
+
+if : >/dev/tcp/8.8.8.8/53; then
+  msg_ok "Internet Online"
+else
+  echo -e "${BFR} ${CROSS}${RD} Internet Offline"
+fi
 
 msg_info "Updating Container OS"
 apt update &>/dev/null
@@ -62,47 +68,34 @@ msg_ok "Updated Container OS"
 msg_info "Installing Dependencies"
 apt-get install -y curl &>/dev/null
 apt-get install -y sudo &>/dev/null
-apt-get install -y cifs-utils &>/dev/null
+apt-get install -y openjdk-11-jdk &>/dev/null
 msg_ok "Installed Dependencies"
 
-msg_info "Installing Motion"
- apt-get install motion -y &>/dev/null
- systemctl stop motion &>/dev/null
- systemctl disable motion &>/dev/null
-msg_ok "Installed Motion"
+msg_info "Installing Keycloak"
+cd /opt
+wget https://github.com/keycloak/keycloak/releases/download/18.0.0/keycloak-18.0.0.tar.gz &>/dev/null
+tar -xvf keycloak-18.0.0.tar.gz &>/dev/null
+mv keycloak-18.0.0 keycloak
+msg_ok "Installed Keycloak"
 
-msg_info "Installing FFmpeg"
- apt-get install ffmpeg v4l-utils -y &>/dev/null
-msg_ok "Installed FFmpeg"
-
-msg_info "Installing Python"
- apt-get update &>/dev/null
- apt-get install python2 -y &>/dev/null
- curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py &>/dev/null
- python2 get-pip.py &>/dev/null
- apt-get install libffi-dev libzbar-dev libzbar0 -y &>/dev/null
- apt-get install python2-dev libssl-dev libcurl4-openssl-dev libjpeg-dev -y &>/dev/null
- msg_ok "Installed Python"
- 
-msg_info "Installing MotionEye"
- apt-get update &>/dev/null
- sudo pip install motioneye &>/dev/null
- mkdir -p /etc/motioneye
- cp /usr/local/share/motioneye/extra/motioneye.conf.sample /etc/motioneye/motioneye.conf
- mkdir -p /var/lib/motioneye
-msg_ok "Installed MotionEye"
-
-msg_info "Creating Service" 
- cp /usr/local/share/motioneye/extra/motioneye.systemd-unit-local /etc/systemd/system/motioneye.service &>/dev/null
- systemctl enable motioneye &>/dev/null
- systemctl start motioneye 
-msg_ok "Created Service" 
+msg_info "Creating Service"
+service_path="/etc/systemd/system/keycloak.service"
+echo "[Unit]
+Description=Keycloak
+After=network-online.target
+[Service]
+User=root
+WorkingDirectory=/opt/keycloak
+ExecStart=/opt/keycloak/bin/kc.sh start-dev
+[Install]
+WantedBy=multi-user.target" > $service_path
+systemctl enable --now keycloak.service &>/dev/null
+msg_ok "Created Service"
 
 PASS=$(grep -w "root" /etc/shadow | cut -b6);
   if [[ $PASS != $ ]]; then
 msg_info "Customizing Container"
-rm /etc/motd
-rm /etc/update-motd.d/10-uname
+chmod -x /etc/update-motd.d/*
 touch ~/.hushlogin
 GETTY_OVERRIDE="/etc/systemd/system/container-getty@1.service.d/override.conf"
 mkdir -p $(dirname $GETTY_OVERRIDE)

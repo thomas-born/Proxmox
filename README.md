@@ -105,7 +105,7 @@ ________________________________________________________________________________
 <details>
 <summary markdown="span"> Home Assistant OS VM</summary>
  
-<p align="center"><img src="https://github.com/tteck/Proxmox/blob/main/misc/images/social.png?raw=true"/></p>
+<p align="center"><img src="https://github.com/tteck/Proxmox/blob/main/misc/images/haos.png?raw=true"/></p>
  
 <h1 align="center" id="heading"> Home Assistant OS VM </h1>
 <h3 align="center"> Option to create VM using the Latest or Stable Image </h3>
@@ -150,7 +150,7 @@ bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/homeassistan
 ```yaml
 /var/lib/docker/volumes/hass_config/_data
  ```
-⚙️ **To Edit the HA configuration.yaml** (Recommend Using Webmin System Administration)
+⚙️ **To Edit the HA configuration.yaml** (Recommend Using File Browser)
  
 Run in the LXC console
 ```yaml
@@ -190,13 +190,6 @@ Run in the LXC console
 ```yaml
 ./update
 ```
-⚙️ **Migrate to the latest Update Menu**
-
-Run in the LXC console
-```yaml
-bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/misc/latest-update-menu.sh)"
-```
- 
 ____________________________________________________________________________________________ 
 </details>
 
@@ -641,7 +634,7 @@ ________________________________________________________________________________
 </details>
 
 <details>
-<summary markdown="span"> 🔸PostgreSQL LXC </summary>
+<summary markdown="span"> PostgreSQL LXC </summary>
  
 <p align="center"><img src="https://wiki.postgresql.org/images/3/30/PostgreSQL_logo.3colors.120x120.png" height="100"/><img src="https://raw.githubusercontent.com/tteck/Proxmox/main/misc/images/adminer_logo-cl.png" height="60"></p>
 
@@ -1481,6 +1474,45 @@ ________________________________________________________________________________
 </details>
 
 <details>
+<summary markdown="span"> File Browser</summary>
+ 
+<p align="center"><img src="https://github.com/tteck/Proxmox/blob/main/misc/images/filebrowser.png?raw=true" height="100"/></p>
+
+<h1 align="center" id="heading"> File Browser </h1>
+
+To Install File Browser, ⚠️ run the following in the LXC console.
+
+```yaml
+bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/misc/filebrowser-v3.sh)"
+```
+
+[File Browser](https://filebrowser.org/features) is a create-your-own-cloud-kind of software where you can install it on a server, direct it to a path and then access your files through a nice web interface. Many available features!
+
+
+
+**File Browser Interface - http:// IP:8080**
+
+⚙️ **Initial Login**
+
+**username** 
+ ```yaml
+ admin
+ ```
+ **password** 
+ ```yaml
+ changeme
+ ```
+ 
+⚙️ **To Update File Browser**
+
+```yaml
+curl -fsSL https://raw.githubusercontent.com/filebrowser/get/master/get.sh | bash
+```
+___________________________________________________________________________________________ 
+
+</details>
+
+<details>
 <summary markdown="span"> Webmin System Administration</summary>
  
 <p align="center"><img src="https://github.com/webmin/webmin/blob/master/images/webmin-blue.png?raw=true" height="100"/></p>
@@ -1579,28 +1611,91 @@ ________________________________________________________________________________
 </details>
 
 <details>
-<summary markdown="span"> Vaultwarden LXC</summary>
+<summary markdown="span"> 🔸CrowdSec</summary>
+ 
+<p align="center"><img src="https://raw.githubusercontent.com/crowdsecurity/crowdsec-docs/main/crowdsec-docs/static/img/crowdsec_no_txt.png?raw=true" height="100"/></p>
+
+<h1 align="center" id="heading"> CrowdSec</h1>
+
+To Install CrowdSec, ⚠️ run the following in the LXC console.
+
+```yaml
+bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/misc/crowdsec-v3.sh)"
+```
+
+[CrowdSec](https://crowdsec.net/) is a free, open-source and collaborative IPS. Analyze behaviors, respond to attacks & share signals across the community.
+
+[**Control center for your CrowdSec machines.**](https://app.crowdsec.net/product-tour)
+
+___________________________________________________________________________________________ 
+
+</details>
+
+<details>
+<summary markdown="span"> Keycloak LXC</summary>
+ 
+<p align="center"><img src="https://www.keycloak.org/resources/images/keycloak_icon_512px.svg?raw=true" height="100"/></p>
+
+<h1 align="center" id="heading"> Keycloak LXC</h1>
+
+To create a new Proxmox Keycloak LXC, run the following in the Proxmox Shell.
+
+```yaml
+bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/keycloak-v3.sh)"
+```
+
+[Keycloak](https://www.keycloak.org/) is an Open Source Identity and Access Management solution for modern Applications and Services.
+
+**Keycloak Interface - http:// IP:8080** (First start can take a few minutes)
+
+⚙️ **Initial Login**
+
+The initial admin user can be added manually using the web frontend when accessed from localhost or automatically using environment variables.
+
+To add the initial admin user using environment variables, set `KEYCLOAK_ADMIN` for the initial admin username and `KEYCLOAK_ADMIN_PASSWORD` for the initial admin password.
+ 
+First, stop Keycloak
+```yaml
+systemctl stop keycloak.service
+```
+then start Keycloak by coping & pasting the following (only needed once)
+```yaml
+cd /opt/keycloak
+export KEYCLOAK_ADMIN=admin
+export KEYCLOAK_ADMIN_PASSWORD=changeme
+
+bin/kc.sh start-dev 
+```
+⚙️ **To Update Keycloak**
+
+```yaml
+working On
+```
+___________________________________________________________________________________________ 
+
+</details>
+
+<details>
+<summary markdown="span"> 🔸Vaultwarden LXC</summary>
  
 <p align="center"><img src="https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-icon-white.svg" width="100" height="100"/></p>
 
 <h1 align="center" id="heading"> Vaultwarden LXC </h1>
 
+Alternative implementation of the Bitwarden server API written in Rust and compatible with upstream [Bitwarden clients](https://bitwarden.com/download/), perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.
+ 
 To create a new Proxmox Vaultwarden LXC, run the following in the Proxmox Shell.
 
 ```yaml
 bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/vaultwarden-v3.sh)"
 ```
 ⚠️ Vaultwarden needs to be behind a proxy (Nginx Proxy Manager) to obtain HTTPS and to allow clients to connect.
- 
-⚠️ If you find the Vaultwarden Interface unreachable,  `nano /etc/vaultwarden.env` and uncomment `ROCKET_ADDRESS=0.0.0.0` and reboot
 
-It builds from source, which takes time and resources. After the installation, resources can be set to Normal Settings. 
+The script builds from source, which takes time and resources. After the build, the script will automatically set resources to Normal Settings. 
 
 Expect 30+ minute install time.
-<h3 align="center" id="heading">⚡ Normal Settings:  512Mib RAM - 8GB Storage - 1vCPU ⚡</h3>
+<h3 align="center" id="heading">⚡ Normal Settings:  512Mib RAM - 6GB Storage - 1vCPU ⚡</h3>
 
-[Clients](https://bitwarden.com/download/)
- 
 **Vaultwarden Interface - IP:8000**
 
 ⚙️ **To Update Vaultwarden**
