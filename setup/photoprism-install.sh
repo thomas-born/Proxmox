@@ -55,12 +55,6 @@ done
 msg_ok "Set up Container OS"
 msg_ok "Network Connected: ${BL}$(hostname -I)"
 
-if : >/dev/tcp/8.8.8.8/53; then
-  msg_ok "Internet Online"
-else
-  echo -e "${BFR} ${CROSS}${RD} Internet Offline"
-fi
-
 msg_info "Updating Container OS"
 apt update &>/dev/null
 apt-get -qqy upgrade &>/dev/null
@@ -76,6 +70,7 @@ apt-get install -y gnupg &>/dev/null
 apt-get install -y make &>/dev/null
 apt-get install -y zip &>/dev/null
 apt-get install -y unzip &>/dev/null
+apt-get install -y ffmpeg &>/dev/null
 msg_ok "Installed Dependencies"
 
 msg_info "Setting up Node.js Repository"
@@ -87,8 +82,8 @@ apt-get install -y nodejs &>/dev/null
 msg_ok "Installed Node.js"
 
 msg_info "Installing Golang"
-wget https://golang.org/dl/go1.18.1.linux-amd64.tar.gz &>/dev/null
-tar -xzf go1.18.1.linux-amd64.tar.gz -C /usr/local &>/dev/null
+wget https://golang.org/dl/go1.18.3.linux-amd64.tar.gz &>/dev/null
+tar -xzf go1.18.3.linux-amd64.tar.gz -C /usr/local &>/dev/null
 ln -s /usr/local/go/bin/go /usr/local/bin/go &>/dev/null
 go install github.com/tianon/gosu@latest &>/dev/null
 go install golang.org/x/tools/cmd/goimports@latest &>/dev/null

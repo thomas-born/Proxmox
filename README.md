@@ -10,7 +10,7 @@
 
 <h1 align="center" id="heading"> Proxmox VE 7 Post Install </h1>
 
-This script will give options to Disable the Enterprise Repo, Add/Correct PVE7 Sources, Enable the No-Subscription Repo, Add Test Repo and Disable Subscription Nag. 
+The script will give options to Disable the Enterprise Repo, Add/Correct PVE7 Sources, Enable the No-Subscription Repo, Add Test Repo, Disable Subscription Nag and Update Proxmox VE.
  
 Run the following in the Proxmox Shell. ⚠️ **PVE7 ONLY**
 
@@ -18,7 +18,7 @@ Run the following in the Proxmox Shell. ⚠️ **PVE7 ONLY**
 bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/misc/post-install-v3.sh)"
 ```
 
-It's recommended to update Proxmox after running this script, before adding any VM/CT.
+It's recommended to answer `y` to all options.
 
 ____________________________________________________________________________________________ 
 
@@ -109,6 +109,8 @@ ________________________________________________________________________________
  
 <h1 align="center" id="heading"> Home Assistant OS VM </h1>
 <h3 align="center"> Option to create VM using the Latest or Stable Image </h3>
+
+The script automates the manual process of finding, downloading and extracting the Official KVM (qcow2) disk image provided by the Home Assistant Team, creating a VM with user defined settings, importing and attaching the disk, setting the boot order and starting the VM. No hidden (kpartx, unzip) installs of any kind.
 
 To create a new Proxmox Home Assistant OS VM, run the following in the Proxmox Shell
 
@@ -617,7 +619,11 @@ sudo systemctl status mariadb
 ``` 
 Change the recorder: `db_url:` in your HA configuration.yaml
  
-Example: `mysql://admin:password@192.168.100.26:3306/homeassistant?charset=utf8mb4`
+Example:
+```yaml
+recorder:
+  db_url: mysql://admin:password@192.168.100.26:3306/homeassistant?charset=utf8mb4
+```
  
 ⚙️ **To Update Mariadb:**
 
@@ -686,8 +692,11 @@ Then type exit to get back to root
 
 Change the recorder: `db_url:` in your HA configuration.yaml
  
-Example: `db_url: postgresql://admin:your-password@192.168.100.20:5432/homeassistant?client_encoding=utf8`
- 
+Example:
+```yaml
+recorder:
+  db_url: postgresql://admin:your-password@192.168.100.20:5432/homeassistant?client_encoding=utf8
+``` 
 ⚙️ **To Update PostgreSQL**
 
 Run in the LXC console
@@ -867,6 +876,35 @@ bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/nocodb-v3.sh
 Run in the LXC console
 ```yaml
 bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/misc/nocodb-update.sh)"
+```
+
+____________________________________________________________________________________________ 
+
+</details>
+
+<details>
+<summary markdown="span"> Prometheus LXC </summary>
+ 
+<p align="center"><img src="https://github.com/tteck/Proxmox/blob/main/misc/images/prome.png?raw=true" height="100"/></p>
+
+<h1 align="center" id="heading"> Prometheus LXC </h1>
+
+[Prometheus](https://prometheus.io/) is an open-source systems monitoring and alerting toolkit
+
+To create a new Proxmox Prometheus LXC, run the following in the Proxmox Shell.
+
+```yaml
+bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/prometheus-v3.sh)"
+```
+
+<h3 align="center" id="heading">⚡ Default Settings:  2GB RAM - 4GB Storage - 1vCPU ⚡</h3>
+
+**Prometheus Interface - IP:9090**
+
+⚙️ **To Update Prometheus**
+
+```yaml
+Working On
 ```
 
 ____________________________________________________________________________________________ 
@@ -1177,6 +1215,8 @@ bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/jellyfin-v3.
 
 **Jellyfin Media Server Interface - IP:8096**
 
+FFmpeg path: `/usr/lib/jellyfin-ffmpeg/ffmpeg`
+
 ⚙️ **To Update Jellyfin Media Server**
 
 Run in the LXC console
@@ -1289,7 +1329,7 @@ To create a new Proxmox Uptime Kuma LXC, run the following in the Proxmox Shell.
 bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/uptimekuma-v3.sh)"
 ```
 
-<h3 align="center" id="heading">⚡ Default Settings:  512MiB RAM - 2GB Storage - 1vCPU ⚡</h3>
+<h3 align="center" id="heading">⚡ Default Settings:  1GB RAM - 2GB Storage - 1vCPU ⚡</h3>
 
 **Uptime Kuma Interface - IP:3001**
 
@@ -1298,6 +1338,35 @@ bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/uptimekuma-v
 Run in the LXC console
 ```yaml
 bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/misc/uptimekuma-update.sh)"
+```
+____________________________________________________________________________________________ 
+
+</details>
+
+<details>
+<summary markdown="span"> Whoogle LXC </summary>
+ 
+<p align="center"><img src="https://github.com/tteck/Proxmox/blob/main/misc/images/whoogle.png?raw=true" height="100"/></p>
+
+<h1 align="center" id="heading"> Whoogle LXC </h1>
+
+Get Google search results, but without any ads, javascript, AMP links, cookies, or IP address tracking.
+
+To create a new Proxmox Whoogle LXC, run the following in the Proxmox Shell.
+
+```yaml
+bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/whoogle-v3.sh)"
+```
+
+<h3 align="center" id="heading">⚡ Default Settings:  512MiB RAM - 2GB Storage - 1vCPU ⚡</h3>
+
+**Whoogle Interface - IP:5000**
+
+⚙️ **To Update Whoogle**
+
+Run in the LXC console
+```yaml
+pip3 install whoogle-search --upgrade
 ```
 ____________________________________________________________________________________________ 
 
@@ -1609,9 +1678,37 @@ apt update && apt upgrade -y
 ____________________________________________________________________________________________ 
 
 </details>
+<details>
+<summary markdown="span"> 🔸Tailscale</summary>
+ 
+<p align="center"><img src="https://avatars.githubusercontent.com/u/48932923?v=4&s=100"/></p>
+
+<h1 align="center" id="heading"> Tailscale</h1>
+
+[Tailscale](https://tailscale.com/) Creates a secure network between your servers, computers, and cloud instances. Even when separated by firewalls or subnets, Tailscale just works.
+
+To Install Talescale on an existing LXC, run the following in the Proxmox Shell (replace `106` with your LXC ID).
+
+```yaml
+bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/misc/add-tailscale-lxc.sh)" -s 106
+```
+After the script finishes, reboot the LXC then run `tailscale up` in the LXC console
+
+[**Tailscale Login**](https://login.tailscale.com/start)
+
+⚙️ **To Update Tailscale**
+ 
+Run in the LXC console
+ ```yaml
+apt update && apt upgrade -y
+```
+
+___________________________________________________________________________________________ 
+
+</details>
 
 <details>
-<summary markdown="span"> 🔸CrowdSec</summary>
+<summary markdown="span"> CrowdSec</summary>
  
 <p align="center"><img src="https://raw.githubusercontent.com/crowdsecurity/crowdsec-docs/main/crowdsec-docs/static/img/crowdsec_no_txt.png?raw=true" height="100"/></p>
 
@@ -1676,7 +1773,7 @@ ________________________________________________________________________________
 </details>
 
 <details>
-<summary markdown="span"> 🔸Vaultwarden LXC</summary>
+<summary markdown="span"> Vaultwarden LXC</summary>
  
 <p align="center"><img src="https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-icon-white.svg" width="100" height="100"/></p>
 
@@ -1698,6 +1795,11 @@ Expect 30+ minute install time.
 
 **Vaultwarden Interface - IP:8000**
 
+⚙️ **Path to Vaultwarden .env file** (to enable `ADMIN_TOKEN`)
+```yaml
+/opt/vaultwarden/.env
+```
+ 
 ⚙️ **To Update Vaultwarden**
 
 Run in the LXC console

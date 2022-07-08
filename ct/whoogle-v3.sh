@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
+APP="Whoogle"
+var_disk="2"
+var_cpu="1"
+var_ram="512"
+var_os="debian"
+var_version="11"
 NEXTID=$(pvesh get /cluster/nextid)
 INTEGER='^[0-9]+$'
+NSAPP=$(echo ${APP,,} | tr -d ' ')
+var_install="${NSAPP}-install"
+PP=`echo "\e[1;35m"`
 YW=`echo "\033[33m"`
 BL=`echo "\033[36m"`
 RD=`echo "\033[01;31m"`
@@ -11,8 +20,6 @@ CL=`echo "\033[m"`
 BFR="\\r\\033[K"
 HOLD="-"
 CM="${GN}✓${CL}"
-APP="Uptime Kuma"
-NSAPP=$(echo ${APP,,} | tr -d ' ')
 set -o errexit
 set -o errtrace
 set -o nounset
@@ -30,6 +37,16 @@ function error_exit() {
   exit $EXIT
 }
 
+function msg_info() {
+   local msg="$1"
+   echo -ne " ${HOLD} ${YW}${msg}..."
+}
+
+function msg_ok() {
+   local msg="$1"
+   echo -e "${BFR} ${CM} ${GN}${msg}${CL}"
+}
+
 while true; do
     read -p "This will create a New ${APP} LXC. Proceed(y/n)?" yn
     case $yn in
@@ -40,29 +57,17 @@ while true; do
 done
 clear
 function header_info {
-echo -e "${DGN}
-  _    _       _   _                  _  __                     
- | |  | |     | | (_)                | |/ /                     
- | |  | |_v3_ | |_ _ _ __ ___   ___  | ' /_   _ _ __ ___   __ _ 
- | |  | |  _ \| __| |  _   _ \ / _ \ |  <| | | |  _   _ \ / _  |
- | |__| | |_) | |_| | | | | | |  __/ | . \ |_| | | | | | | (_| |
-  \____/| .__/ \__|_|_| |_| |_|\___| |_|\_\__,_|_| |_| |_|\__,_|
-        | |                                                     
-        |_|                                                     
+echo -e "${PP}
+ __          ___    _  ____   ____   _____ _      ______ 
+ \ \   v3   / / |  | |/ __ \ / __ \ / ____| |    |  ____|
+  \ \  /\  / /| |__| | |  | | |  | | |  __| |    | |__   
+   \ \/  \/ / |  __  | |  | | |  | | | |_ | |    |  __|  
+    \  /\  /  | |  | | |__| | |__| | |__| | |____| |____ 
+     \/  \/   |_|  |_|\____/ \____/ \_____|______|______|
 ${CL}"
 }
 
 header_info
-
-function msg_info() {
-    local msg="$1"
-    echo -ne " ${HOLD} ${YW}${msg}..."
-}
-
-function msg_ok() {
-    local msg="$1"
-    echo -e "${BFR} ${CM} ${GN}${msg}${CL}"
-}
 
 function PVE_CHECK() {
     PVE=$(pveversion | grep "pve-manager/7" | wc -l)
@@ -87,12 +92,12 @@ function default_settings() {
         CT_ID=$NEXTID
         echo -e "${DGN}Using CT Name ${BGN}$NSAPP${CL}"
         HN=$NSAPP
-        echo -e "${DGN}Using Disk Size ${BGN}4${CL}${DGN}GB${CL}"
-        DISK_SIZE="4"
-        echo -e "${DGN}Using ${BGN}1${CL}${DGN}vCPU${CL}"
-        CORE_COUNT="1"
-        echo -e "${DGN}Using ${BGN}1024${CL}${DGN}MiB RAM${CL}"
-        RAM_SIZE="1024"
+        echo -e "${DGN}Using Disk Size ${BGN}$var_disk${CL}${DGN}GB${CL}"
+        DISK_SIZE="$var_disk"
+        echo -e "${DGN}Using ${BGN}$var_cpu${CL}${DGN}vCPU${CL}"
+        CORE_COUNT="$var_cpu"
+        echo -e "${DGN}Using ${BGN}$var_ram${CL}${DGN}MiB RAM${CL}"
+        RAM_SIZE="$var_ram"
         echo -e "${DGN}Using Bridge ${BGN}vmbr0${CL}"
         BRG="vmbr0"
         echo -e "${DGN}Using Static IP Address ${BGN}DHCP${CL}"
@@ -166,9 +171,9 @@ header_info
         echo -e "${DGN}Using CT Password ${BGN}$PW1${CL}"
         echo -e "${DGN}Using CT ID ${BGN}$CT_ID${CL}"
         echo -e "${DGN}Using CT Name ${BGN}$HN${CL}"
-        echo -e "${YW}Enter a Disk Size, or Press [ENTER] for Default: 4 "
+        echo -e "${YW}Enter a Disk Size, or Press [ENTER] for Default: $var_disk "
         read DISK_SIZE
-        if [ -z $DISK_SIZE ]; then DISK_SIZE="4"; fi;
+        if [ -z $DISK_SIZE ]; then DISK_SIZE="$var_disk"; fi;
         if ! [[ $DISK_SIZE =~ $INTEGER ]] ; then echo "ERROR! DISK SIZE MUST HAVE INTEGER NUMBER!"; exit; fi;
         echo -en "${DGN}Set Disk Size To ${BL}$DISK_SIZE${CL}${DGN}GB${CL}"
 echo -e " ${CM}${CL} \r"
@@ -181,9 +186,9 @@ header_info
         echo -e "${DGN}Using CT ID ${BGN}$CT_ID${CL}"
         echo -e "${DGN}Using CT Name ${BGN}$HN${CL}"
         echo -e "${DGN}Using Disk Size ${BGN}$DISK_SIZE${CL}${DGN}GB${CL}"
-        echo -e "${YW}Allocate CPU cores, or Press [ENTER] for Default: 1 "
+        echo -e "${YW}Allocate CPU cores, or Press [ENTER] for Default: $var_cpu "
         read CORE_COUNT
-        if [ -z $CORE_COUNT ]; then CORE_COUNT="1"; fi;
+        if [ -z $CORE_COUNT ]; then CORE_COUNT="$var_cpu"; fi;
         echo -en "${DGN}Set Cores To ${BL}$CORE_COUNT${CL}${DGN}vCPU${CL}"
 echo -e " ${CM}${CL} \r"
 sleep 1
@@ -196,9 +201,9 @@ header_info
         echo -e "${DGN}Using CT Name ${BGN}$HN${CL}"
         echo -e "${DGN}Using Disk Size ${BGN}$DISK_SIZE${CL}${DGN}GB${CL}"
         echo -e "${DGN}Using ${BGN}${CORE_COUNT}${CL}${DGN}vCPU${CL}"
-        echo -e "${YW}Allocate RAM in MiB, or Press [ENTER] for Default: 1024 "
+        echo -e "${YW}Allocate RAM in MiB, or Press [ENTER] for Default: $var_ram "
         read RAM_SIZE
-        if [ -z $RAM_SIZE ]; then RAM_SIZE="1024"; fi;
+        if [ -z $RAM_SIZE ]; then RAM_SIZE="$var_ram"; fi;
         echo -en "${DGN}Set RAM To ${BL}$RAM_SIZE${CL}${DGN}MiB RAM${CL}"
 echo -e " ${CM}${CL} \n"
 sleep 1
@@ -321,12 +326,9 @@ if [ "$CT_TYPE" == "1" ]; then
  FEATURES="nesting=1"
  fi
 
-TEMP_DIR=$(mktemp -d)
-pushd $TEMP_DIR >/dev/null
-
 export CTID=$CT_ID
-export PCT_OSTYPE=debian
-export PCT_OSVERSION=11
+export PCT_OSTYPE=$var_os
+export PCT_OSVERSION=$var_version
 export PCT_DISK_SIZE=$DISK_SIZE
 export PCT_OPTIONS="
   -features $FEATURES
@@ -344,10 +346,10 @@ msg_info "Starting LXC Container"
 pct start $CTID
 msg_ok "Started LXC Container"
 
-lxc-attach -n $CTID -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/tteck/Proxmox/main/setup/uptimekuma-install.sh)" || exit
+lxc-attach -n $CTID -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/tteck/Proxmox/main/setup/$var_install.sh)" || exit
 
 IP=$(pct exec $CTID ip a s dev eth0 | sed -n '/inet / s/\// /p' | awk '{print $2}')
 
 msg_ok "Completed Successfully!\n"
 echo -e "${APP} should be reachable by going to the following URL.
-         ${BL}http://${IP}:3001${CL}\n"
+      ${BL}http://${IP}:5000${CL} \n"

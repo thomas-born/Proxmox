@@ -54,12 +54,6 @@ done
 msg_ok "Setup Container OS"
 msg_ok "Network Connected: ${BL}$(hostname -I)"
 
-if : >/dev/tcp/8.8.8.8/53; then
-  msg_ok "Internet Online"
-else
-  echo -e "${BFR} ${CROSS}${RD} Internet Offline"
-fi
-
 msg_info "Updating Container OS"
 apt update &>/dev/null
 apt-get -qqy upgrade &>/dev/null
@@ -112,6 +106,7 @@ msg_ok "Downloaded Web-Vault ${WEBVAULT}"
 
 cat <<EOF > /opt/vaultwarden/.env
 ## https://github.com/dani-garcia/vaultwarden/blob/main/.env.template
+# ADMIN_TOKEN=Vy2VyYTTsKPv8W5aEOWUbB/Bt3DEKePbHmI4m9VcemUMS2rEviDowNAFqYi1xjmp
 ROCKET_ADDRESS=0.0.0.0
 DATA_FOLDER=/opt/vaultwarden/data
 DATABASE_MAX_CONNS=10

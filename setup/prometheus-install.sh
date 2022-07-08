@@ -42,12 +42,12 @@ msg_info "Setting up Container OS "
 sed -i "/$LANG/ s/\(^# \)//" /etc/locale.gen
 locale-gen >/dev/null
 while [ "$(hostname -I)" = "" ]; do
-  1>&2 echo -en "${CROSS}${RD}  No Network! "
+  1>&2 echo -en "${CROSS}${RD} No Network! "
   sleep $RETRY_EVERY
   ((NUM--))
   if [ $NUM -eq 0 ]
   then
-    1>&2 echo -e "${CROSS}${RD}  No Network After $RETRY_NUM Tries${CL}"    
+    1>&2 echo -e "${CROSS}${RD} No Network After $RETRY_NUM Tries${CL}"    
     exit 1
   fi
 done
@@ -62,51 +62,46 @@ msg_ok "Updated Container OS"
 msg_info "Installing Dependencies"
 apt-get install -y curl &>/dev/null
 apt-get install -y sudo &>/dev/null
-apt-get install -y git &>/dev/null
-apt-get install -y make &>/dev/null
-apt-get install -y g++ &>/dev/null
-apt-get install -y gcc &>/dev/null
 msg_ok "Installed Dependencies"
 
-msg_info "Setting up Node.js Repository"
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &>/dev/null
-msg_ok "Set up Node.js Repository"
-
-msg_info "Installing Node.js"
-apt-get install -y nodejs &>/dev/null
-msg_ok "Installed Node.js"
- 
-msg_info "Setting up Zigbee2MQTT Repository"
-sudo git clone --depth 1 https://github.com/Koenkk/zigbee2mqtt.git /opt/zigbee2mqtt &>/dev/null
-msg_ok "Set up Zigbee2MQTT Repository"
-
-msg_info "Installing Zigbee2MQTT"
-cd /opt/zigbee2mqtt &>/dev/null
-npm ci &>/dev/null
-msg_ok "Installed Zigbee2MQTT"
+msg_info "Installing Prometheus"
+mkdir -p /etc/prometheus
+mkdir -p /var/lib/prometheus
+wget https://github.com/prometheus/prometheus/releases/download/v2.36.2/prometheus-2.36.2.linux-amd64.tar.gz &>/dev/null
+tar -xvf prometheus-2.36.2.linux-amd64.tar.gz &>/dev/null
+cd prometheus-2.36.2.linux-amd64
+mv prometheus promtool /usr/local/bin/
+mv consoles/ console_libraries/ /etc/prometheus/
+mv prometheus.yml /etc/prometheus/prometheus.yml
+msg_ok "Installed Prometheus"
 
 msg_info "Creating Service"
-service_path="/etc/systemd/system/zigbee2mqtt.service"
+service_path="/etc/systemd/system/prometheus.service"
 echo "[Unit]
-Description=zigbee2mqtt
-After=network.target
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
 [Service]
-ExecStart=/usr/bin/npm start
-WorkingDirectory=/opt/zigbee2mqtt
-StandardOutput=inherit
-StandardError=inherit
-Restart=always
 User=root
+Restart=always
+Type=simple
+ExecStart=/usr/local/bin/prometheus \
+    --config.file=/etc/prometheus/prometheus.yml \
+    --storage.tsdb.path=/var/lib/prometheus/ \
+    --web.console.templates=/etc/prometheus/consoles \
+    --web.console.libraries=/etc/prometheus/console_libraries \
+    --web.listen-address=0.0.0.0:9090
+
 [Install]
 WantedBy=multi-user.target" > $service_path
-systemctl enable zigbee2mqtt.service &>/dev/null
+sudo systemctl enable --now prometheus &>/dev/null
 msg_ok "Created Service"
 
 PASS=$(grep -w "root" /etc/shadow | cut -b6);
   if [[ $PASS != $ ]]; then
 msg_info "Customizing Container"
-rm /etc/motd
-rm /etc/update-motd.d/10-uname
+chmod -x /etc/update-motd.d/*
 touch ~/.hushlogin
 GETTY_OVERRIDE="/etc/systemd/system/container-getty@1.service.d/override.conf"
 mkdir -p $(dirname $GETTY_OVERRIDE)
@@ -119,9 +114,9 @@ systemctl daemon-reload
 systemctl restart $(basename $(dirname $GETTY_OVERRIDE) | sed 's/\.d//')
 msg_ok "Customized Container"
   fi
-
+  
 msg_info "Cleaning up"
 apt-get autoremove >/dev/null
 apt-get autoclean >/dev/null
-rm -rf /var/{cache,log}/* /var/lib/apt/lists/*
+rm -rf /var/{cache,log}/* /var/lib/apt/lists/* /root/prometheus-2.36.2.linux-amd64  /root/prometheus-2.36.2.linux-amd64.tar.gz
 msg_ok "Cleaned"

@@ -42,12 +42,12 @@ msg_info "Setting up Container OS "
 sed -i "/$LANG/ s/\(^# \)//" /etc/locale.gen
 locale-gen >/dev/null
 while [ "$(hostname -I)" = "" ]; do
-  1>&2 echo -en "${CROSS}${RD}  No Network! "
+  1>&2 echo -en "${CROSS}${RD} No Network! "
   sleep $RETRY_EVERY
   ((NUM--))
   if [ $NUM -eq 0 ]
   then
-    1>&2 echo -e "${CROSS}${RD}  No Network After $RETRY_NUM Tries${CL}"    
+    1>&2 echo -e "${CROSS}${RD} No Network After $RETRY_NUM Tries${CL}"    
     exit 1
   fi
 done
@@ -62,51 +62,33 @@ msg_ok "Updated Container OS"
 msg_info "Installing Dependencies"
 apt-get install -y curl &>/dev/null
 apt-get install -y sudo &>/dev/null
-apt-get install -y git &>/dev/null
-apt-get install -y make &>/dev/null
-apt-get install -y g++ &>/dev/null
-apt-get install -y gcc &>/dev/null
 msg_ok "Installed Dependencies"
 
-msg_info "Setting up Node.js Repository"
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &>/dev/null
-msg_ok "Set up Node.js Repository"
+msg_info "Installing pip3"
+apt-get install python3-pip -y &>/dev/null
+msg_ok "Installed pip3"
 
-msg_info "Installing Node.js"
-apt-get install -y nodejs &>/dev/null
-msg_ok "Installed Node.js"
- 
-msg_info "Setting up Zigbee2MQTT Repository"
-sudo git clone --depth 1 https://github.com/Koenkk/zigbee2mqtt.git /opt/zigbee2mqtt &>/dev/null
-msg_ok "Set up Zigbee2MQTT Repository"
+msg_info "Installing Whoogle"
+pip install whoogle-search &>/dev/null
 
-msg_info "Installing Zigbee2MQTT"
-cd /opt/zigbee2mqtt &>/dev/null
-npm ci &>/dev/null
-msg_ok "Installed Zigbee2MQTT"
-
-msg_info "Creating Service"
-service_path="/etc/systemd/system/zigbee2mqtt.service"
+service_path="/etc/systemd/system/whoogle.service"
 echo "[Unit]
-Description=zigbee2mqtt
+Description=Whoogle-Search
 After=network.target
 [Service]
-ExecStart=/usr/bin/npm start
-WorkingDirectory=/opt/zigbee2mqtt
-StandardOutput=inherit
-StandardError=inherit
+ExecStart=/usr/local/bin/whoogle-search --host 0.0.0.0
 Restart=always
 User=root
 [Install]
 WantedBy=multi-user.target" > $service_path
-systemctl enable zigbee2mqtt.service &>/dev/null
-msg_ok "Created Service"
+
+systemctl enable --now whoogle.service &>/dev/null
+msg_ok "Installed Whoogle"
 
 PASS=$(grep -w "root" /etc/shadow | cut -b6);
   if [[ $PASS != $ ]]; then
 msg_info "Customizing Container"
-rm /etc/motd
-rm /etc/update-motd.d/10-uname
+chmod -x /etc/update-motd.d/*
 touch ~/.hushlogin
 GETTY_OVERRIDE="/etc/systemd/system/container-getty@1.service.d/override.conf"
 mkdir -p $(dirname $GETTY_OVERRIDE)
@@ -119,7 +101,7 @@ systemctl daemon-reload
 systemctl restart $(basename $(dirname $GETTY_OVERRIDE) | sed 's/\.d//')
 msg_ok "Customized Container"
   fi
-
+  
 msg_info "Cleaning up"
 apt-get autoremove >/dev/null
 apt-get autoclean >/dev/null
