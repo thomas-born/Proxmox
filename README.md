@@ -43,6 +43,24 @@ ________________________________________________________________________________
 </details>
 
 <details>
+<summary markdown="span"> 🔸Proxmox Edge Kernel Tool</summary>
+ 
+<p align="center"><img src="https://github.com/home-assistant/brands/blob/master/core_integrations/proxmoxve/icon.png?raw=true" height="100"/></p>
+
+<h1 align="center" id="heading">Proxmox Edge Kernel Tool </h1>
+
+Proxmox [Edge Kernels](https://github.com/fabianishere/pve-edge-kernel) are custom Linux Kernels for Proxmox VE 7. Keeping up with new Kernel releases instead of LTS
+
+Run the following in the Proxmox Shell.
+
+```yaml
+bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/misc/edge-kernel.sh)"
+```
+____________________________________________________________________________________________ 
+
+</details>
+
+<details>
 <summary markdown="span"> Proxmox CPU Scaling Governor</summary>
  
 <p align="center"><img src="https://github.com/tteck/Proxmox/blob/main/misc/images/cpu.png?raw=true" height="100"/></p>
@@ -103,14 +121,14 @@ ________________________________________________________________________________
 
 
 <details>
-<summary markdown="span"> Home Assistant OS VM</summary>
+<summary markdown="span"> 🔸Home Assistant OS VM</summary>
  
 <p align="center"><img src="https://github.com/tteck/Proxmox/blob/main/misc/images/haos.png?raw=true"/></p>
  
 <h1 align="center" id="heading"> Home Assistant OS VM </h1>
 <h3 align="center"> Option to create VM using the Latest or Stable Image </h3>
 
-The script automates the manual process of finding, downloading and extracting the Official KVM (qcow2) disk image provided by the Home Assistant Team, creating a VM with user defined settings, importing and attaching the disk, setting the boot order and starting the VM. No hidden (kpartx, unzip) installs of any kind.
+The script automates the manual process of finding, downloading and extracting the Official KVM (qcow2) disk image provided by the Home Assistant Team, creating a VM with user defined settings, importing and attaching the disk, setting the boot order and starting the VM. No hidden (kpartx, unzip, ect...) installs of any kind. Supports lvmthin, zfspool, nfs, dir and btrfs storage types.
 
 To create a new Proxmox Home Assistant OS VM, run the following in the Proxmox Shell
 
@@ -135,7 +153,9 @@ ________________________________________________________________________________
 <img src="https://avatars.githubusercontent.com/u/13844975?s=200&amp;v=4" alt="@home-assistant" width="100" height="100"/><img src="https://avatars1.githubusercontent.com/u/22225832?s=400&amp;v=4" alt="GitHub - portainer/portainer-docs: Portainer documentation" width="100" height="100"/></p>
 
 <h1 align="center" id="heading"> Home Assistant Container LXC </h1>
- 
+
+A standalone container-based installation of Home Assistant Core
+
 To create a new Proxmox Home Assistant Container LXC, run the following in the Proxmox Shell.
  
 ```yaml
@@ -202,9 +222,11 @@ ________________________________________________________________________________
 <img src="https://avatars.githubusercontent.com/u/13844975?s=200&amp;v=4" alt="@home-assistant" width="100" height="100"/><img/><img src="https://raw.githubusercontent.com/SelfhostedPro/Yacht/master/readme_media/Yacht_logo_1_dark.png" height="80"/><img/></p>
  
 <h1 align="center" id="heading"> Podman Home Assistant Container LXC </h1>
-To create a new Proxmox Podman Home Assistant Container LXC, run the following in the Proxmox Shell. 
+A standalone container-based installation of Home Assistant Core
 
- ([What is Podman?](https://youtu.be/lkg5QJsoCCQ)) ⚠️ Podman seems to need a privileged LXC
+⚠️ Podman seems to need a privileged LXC
+
+To create a new Proxmox Podman Home Assistant Container LXC, run the following in the Proxmox Shell. 
 
 ```yaml
 bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/podman-homeassistant-v3.sh)"
@@ -329,7 +351,8 @@ ________________________________________________________________________________
 <p align="center"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.dingz.ch%2Fadmin%2Fdata%2Ffiles%2Fintegration%2Flogo%2F20%2F200514-em-logo-homebridge_logo.png%3Flm%3D1589459081&f=1&nofb=1" height="100"/></p>
 
 <h1 align="center" id="heading"> Homebridge LXC </h1>
-Homebridge allows you to integrate with smart home devices that do not natively support HomeKit
+
+[Homebridge](https://homebridge.io/) allows you to integrate with smart home devices that do not natively support HomeKit
 
 To create a new Proxmox Homebridge LXC, run the following in the Proxmox Shell.
 
@@ -386,6 +409,8 @@ Update from the Homebridge UI
 
 <h1 align="center" id="heading"> ESPHome LXC </h1>
 
+[ESPHome](https://esphome.io/) is a system to control your ESP8266/ESP32 by simple yet powerful configuration files and control them remotely through Home Automation systems.
+
 To create a new Proxmox ESPHome LXC, run the following in the Proxmox Shell.
 
 ```yaml
@@ -416,6 +441,8 @@ ________________________________________________________________________________
 
 
 <h1 align="center" id="heading"> Nginx Proxy Manager LXC </h1>
+
+[Nginx Proxy Manager](https://nginxproxymanager.com/) Expose your services easily and securely
 
 To create a new Proxmox Nginx Proxy Manager LXC Container, run the following in the Proxmox Shell.
 
@@ -464,8 +491,9 @@ bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/misc/npm_update
  
 <p align="center"><img src="https://mosquitto.org/images/mosquitto-text-side-28.png" height="75"/></p>
 
-
 <h1 align="center" id="heading"> MQTT LXC </h1>
+
+[Eclipse Mosquitto](https://mosquitto.org/) is an open source message broker that implements the MQTT protocol
 
 To create a new Proxmox MQTT LXC, run the following in the Proxmox Shell.
 
@@ -517,6 +545,7 @@ ________________________________________________________________________________
 
 <h1 align="center" id="heading"> Node-Red LXC </h1>
  
+[Node-RED](https://nodered.org/) is a programming tool for wiring together hardware devices, APIs and online services in new and interesting ways.
 
 To create a new Proxmox Node-RED LXC, run the following in the Proxmox Shell.
 
@@ -559,6 +588,8 @@ ________________________________________________________________________________
 <p align="center"><img src="https://mariadb.com/wp-content/webp-express/webp-images/doc-root/wp-content/themes/sage/dist/images/mariadb-logo-white.png.webp" alt="MariaDB"/><img src="https://raw.githubusercontent.com/tteck/Proxmox/main/misc/images/adminer_logo-cl.png" height="60"></p>
 
 <h1 align="center" id="heading"> Mariadb LXC </h1>
+
+[MariaDB](https://mariadb.org/) is a community-developed, commercially supported fork of the MySQL relational database management system.
 
 To create a new Proxmox Mariadb LXC, run the following in the Proxmox Shell.
  
@@ -675,6 +706,8 @@ ________________________________________________________________________________
 
 <h1 align="center" id="heading"> PostgreSQL LXC </h1>
 
+[PostgreSQL](https://www.postgresql.org/), also known as Postgres, is a free and open-source relational database management system emphasizing extensibility and SQL compliance.
+
 To create a new Proxmox PostgreSQL LXC, run the following in the Proxmox Shell.
  
 ```yaml
@@ -747,6 +780,8 @@ ________________________________________________________________________________
 
 
 <h1 align="center" id="heading">Zigbee2MQTT LXC </h1>
+
+[Zigbee2MQTT](https://www.zigbee2mqtt.io/) is a standalone nodejs application that connects a zigbee network to MQTT
 
 To create a new Proxmox Zigbee2MQTT LXC, run the following in the Proxmox Shell.
 
@@ -828,6 +863,8 @@ ________________________________________________________________________________
 
 <h1 align="center" id="heading"> deCONZ LXC </h1>
 
+[deCONZ](https://www.phoscon.de/en/conbee2/software#deconz) is used to configure, control and display Zigbee networks.
+
 To create a new Proxmox deCONZ LXC, run the following in the Proxmox Shell.
 
 ```yaml
@@ -854,6 +891,8 @@ ________________________________________________________________________________
 <p align="center"><img src="https://github.com/zwave-js/zwavejs2mqtt/raw/master/docs/_images/zwavejs_logo.svg" height="100"/></p>
 
 <h1 align="center" id="heading"> Zwavejs2MQTT LXC </h1>
+
+[Zwavejs2MQTT](https://zwave-js.github.io/zwavejs2mqtt/#/) is a fully configurable Z-Wave to MQTT Gateway and Control Panel.
 
 To create a new Proxmox Zwavejs2MQTT LXC, run the following in the Proxmox Shell.
 
@@ -888,7 +927,7 @@ ________________________________________________________________________________
 
 <h1 align="center" id="heading"> NocoDB LXC </h1>
 
-NocoDB is an open source #NoCode platform that turns any database into a smart spreadsheet. Airtable Alternative.
+[NocoDB](https://www.nocodb.com/) is an open source #NoCode platform that turns any database into a smart spreadsheet. Airtable Alternative.
 
 To create a new Proxmox NocoDB LXC, run the following in the Proxmox Shell.
 
@@ -947,6 +986,10 @@ ________________________________________________________________________________
 
 <h1 align="center" id="heading"> InfluxDB/Telegraf LXC </h1>
 
+[InfluxDB](https://www.influxdata.com/) is an open-source time series database developed by the company InfluxData.
+
+[Telegraf](https://www.influxdata.com/time-series-platform/telegraf/) is an open source plugin-driven server agent for collecting and reporting metrics.
+
 To create a new Proxmox InfluxDB LXC, run the following in the Proxmox Shell.
 
 ```yaml
@@ -987,6 +1030,8 @@ ________________________________________________________________________________
 
 <h1 align="center" id="heading"> Grafana LXC </h1>
 
+[Grafana](https://grafana.com/) is a multi-platform open source analytics and interactive visualization web application.
+
 To create a new Proxmox Grafana LXC, run the following in the Proxmox Shell.
 
 ```yaml
@@ -1026,6 +1071,8 @@ ________________________________________________________________________________
 
 <h1 align="center" id="heading"> Docker LXC </h1>
 <h3 align="center"> Options to Install Portainer and/or Docker Compose V2</h3>
+
+[Docker](https://www.docker.com/) is an open-source project for automating the deployment of applications as portable, self-sufficient containers.
 
 To create a new Proxmox Docker LXC, run the following in the Proxmox Shell.
 
@@ -1264,6 +1311,8 @@ ________________________________________________________________________________
 <p align="center"><img src="https://github.com/home-assistant/brands/blob/master/core_integrations/pi_hole/icon.png?raw=true" height="100"/></p>
 
 <h1 align="center" id="heading"> Pi-hole LXC </h1>
+
+[Pi-hole](https://pi-hole.net/) is a Linux network-level advertisement and Internet tracker blocking application which acts as a DNS sinkhole and optionally a DHCP server.
 
 To create a new Proxmox Pi-hole LXC, run the following in the Proxmox Shell.
 
